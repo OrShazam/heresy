@@ -23,6 +23,7 @@ NTSTATUS NTAPI InjectWorkFactory(
 )
 {
 	NTSTATUS Status = STATUS_NOT_FOUND;
+	SIZE_T RealUserModePayloadSize = UserModePayloadSize;
 
 	PKAPC_STATE ApcState = ExAllocatePoolWithTag(NonPagedPool, sizeof(KAPC_STATE), PoolTag);
 	if (ApcState == NULL)
@@ -53,7 +54,7 @@ NTSTATUS NTAPI InjectWorkFactory(
 			if (!NT_SUCCESS(Status = ZwAllocateVirtualMemory(ProcessHandle, &UserAddress, 0, &UserModePayloadSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE)))
 				break;
 
-			RtlCopyMemory(UserAddress, UserModePayload, UserModePayloadSize);
+			RtlCopyMemory(UserAddress, UserModePayload, RealUserModePayloadSize);
 
 			HANDLE IoCompletionHandle = NULL;
 			ACCESS_MASK IoCompletionAllAccess = STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0x3;
